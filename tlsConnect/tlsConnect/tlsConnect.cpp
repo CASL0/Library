@@ -9,16 +9,24 @@
 #include <string>
 #include <cstdio>
 #include <Windows.h>
+#include <winhttp.h>
 
 #pragma comment(lib,"libssl.lib")
 #pragma comment(lib,"libcrypto.lib")
 #pragma comment(lib,"ws2_32.lib")
 #pragma comment(lib,"crypt32.lib")
+#pragma comment(lib,"winhttp.lib")
 
+#define URL_LENGTH 256
 
 class TLSConnect::Impl 
 {
 public:
+	Impl(wstring wsUrl)
+	{
+		ParseUrl(wsUrl);
+	}
+
 	void open(void)
 	{
 		SSL_library_init();
@@ -53,6 +61,7 @@ private:
 	virtual void SetupBIO(void);
 	virtual void handshake(void);
 	virtual void request(void);
+	virtual void ParseUrl(wstring wsUrl);
 
 protected:
 	void TLSerror(const char *msg)
@@ -71,9 +80,10 @@ private:
 	SSL_CTX* m_ctx;
 	SSL* m_ssl;
 	BIO* m_bio;
+	URL_COMPONENTS m_urlComp;
 };
 
-TLSConnect::TLSConnect(void) :impl(new TLSConnect::Impl) {}
+TLSConnect::TLSConnect(wstring wsUrl) :impl(new Impl(wsUrl)) {}
 
 void TLSConnect::Impl::SetupSslCtx(void)
 {
@@ -132,7 +142,9 @@ void TLSConnect::Impl::SetupBIO(void)
 	}
 
 	SSL_set_mode(m_ssl, SSL_MODE_AUTO_RETRY);
-	BIO_set_conn_hostname(m_bio, "www.microsoft.com:443");
+	char buff[URL_LENGTH];
+	sprintf_s(buff, sizeof(buff), "%ls:443", m_urlComp.lpszHostName);
+	BIO_set_conn_hostname(m_bio,buff);
 }
 
 void TLSConnect::Impl::handshake(void)
@@ -153,7 +165,7 @@ void TLSConnect::Impl::handshake(void)
 void TLSConnect::Impl::request(void)
 {
 	char msg[100] = { 0 };
-	sprintf_s(msg, 100, "GET /ja-jp HTTP/1.1\r\nHost: www.microsoft.com\r\nConnection: Close\r\n\r\n");
+	sprintf_s(msg, 100, "GET %ls HTTP/1.1\r\nHost: %ls\r\nConnection: Close\r\n\r\n",m_urlComp.lpszUrlPath,m_urlComp.lpszHostName);
 	int ret = SSL_write(m_ssl, msg, strlen(msg));
 	if (ret < 1)
 	{
@@ -167,6 +179,33 @@ void TLSConnect::Impl::request(void)
 	{
 		fprintf(stderr, "%s", buf);
 		memset(buf, 0, sizeof(buf));
+	}
+}
+
+void TLSConnect::Impl::ParseUrl(wstring wsUrl)
+{
+	ZeroMemory(&m_urlComp, sizeof(m_urlComp));
+	m_urlComp.dwStructSize = sizeof(m_urlComp);
+
+	static wchar_t schema[URL_LENGTH];
+	static wchar_t hostName[URL_LENGTH];
+	static wchar_t path[URL_LENGTH];
+	static wchar_t parameter[URL_LENGTH];
+
+	m_urlComp.dwSchemeLength = (DWORD)-1;
+	m_urlComp.dwHostNameLength = (DWORD)-1;
+	m_urlComp.dwUrlPathLength = (DWORD)-1;
+	m_urlComp.dwExtraInfoLength = (DWORD)-1;
+
+	m_urlComp.lpszScheme = schema;
+	m_urlComp.lpszHostName = hostName;
+	m_urlComp.lpszUrlPath = path;
+	m_urlComp.lpszExtraInfo = parameter;
+
+	if (!WinHttpCrackUrl(wsUrl.c_str(), wsUrl.length(), 0, &m_urlComp))
+	{
+		fprintf(stderr,"Error %u in WinHttpCrackUrl.\n", GetLastError());
+		exit(1);
 	}
 }
 

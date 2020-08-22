@@ -10,7 +10,7 @@
 int main()
 {
     std::cout << "Hello World!\n";
-    TLSConnect* connect = new TLSConnect();
+    TLSConnect* connect = new TLSConnect(wstring(L"http://www.microsoft.com/ja-jp"));
     connect->open();
     connect->connect();
     connect->close();
