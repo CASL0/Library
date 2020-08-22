@@ -6,7 +6,7 @@ class TLSConnect
 public:
 
 	TLSConnect(void);
-	virtual ~TLSConnect(void) {};
+	virtual ~TLSConnect()=default;
 	void open(void);
 	void connect(void);
 	void close(void);

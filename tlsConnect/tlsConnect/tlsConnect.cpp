@@ -33,24 +33,7 @@ public:
 	{
 		OutputLog("connect");
 		handshake();
-
-		char msg[100]={0};
-		sprintf_s(msg, 100, "GET /ja-jp HTTP/1.1\r\nHost: www.microsoft.com\r\nConnection: Close\r\n\r\n");
-		int ret=SSL_write(m_ssl, msg, strlen(msg));
-		if (ret < 1)
-		{
-			TLSerror("  write msg failed");
-		}
-		int buf_size = 1024;
-		char buf[1024];
-		int read_size;
-
-		while ((read_size=SSL_read(m_ssl,buf,1024-1))>0)
-		{
-			fprintf(stderr, "%s", buf);
-			memset(buf, 0, sizeof(buf));
-		}
-		
+		request();
 	}
 
 	void close(void)
@@ -69,6 +52,7 @@ private:
 	virtual void LoadCertificates(void);
 	virtual void SetupBIO(void);
 	virtual void handshake(void);
+	virtual void request(void);
 
 protected:
 	void TLSerror(const char *msg)
@@ -164,6 +148,26 @@ void TLSConnect::Impl::handshake(void)
 		TLSerror("  verify error");
 	}
 	
+}
+
+void TLSConnect::Impl::request(void)
+{
+	char msg[100] = { 0 };
+	sprintf_s(msg, 100, "GET /ja-jp HTTP/1.1\r\nHost: www.microsoft.com\r\nConnection: Close\r\n\r\n");
+	int ret = SSL_write(m_ssl, msg, strlen(msg));
+	if (ret < 1)
+	{
+		TLSerror("  failed in SSL_write");
+	}
+	int buf_size = 1024;
+	char buf[1024];
+	int read_size;
+
+	while ((read_size = SSL_read(m_ssl, buf, 1024 - 1)) > 0)
+	{
+		fprintf(stderr, "%s", buf);
+		memset(buf, 0, sizeof(buf));
+	}
 }
 
 void TLSConnect::open(void)
