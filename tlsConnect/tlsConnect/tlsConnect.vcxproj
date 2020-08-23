@@ -154,10 +154,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="tlsConnect.cpp" />
+    <ClCompile Include="TLSConnectImpl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tlsConnect.h" />
+    <ClInclude Include="TLSConnectImpl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
