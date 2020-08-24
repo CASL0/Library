@@ -12,9 +12,9 @@
 
 
 
-TLSConnect::TLSConnect(wstring wsUrl) :impl(new Impl(wsUrl)) {}
+CTLSConnect::CTLSConnect(wstring wsUrl) :pimpl(new Impl(wsUrl)) {}
 
-void TLSConnect::Impl::SetupSslCtx(void)
+void CTLSConnect::Impl::SetupSslCtx(void)
 {
 	OutputLog("SetupSslCtx");
 	if ((m_ctx = SSL_CTX_new(TLS_client_method())) == nullptr)
@@ -24,7 +24,7 @@ void TLSConnect::Impl::SetupSslCtx(void)
 	SSL_CTX_set_min_proto_version(m_ctx, TLS1_1_VERSION);
 }
 
-void TLSConnect::Impl::LoadCertificates(void)
+void CTLSConnect::Impl::LoadCertificates(void)
 {
 	OutputLog("LoadCertificates");
 	HCERTSTORE hStore = CertOpenSystemStore(NULL, L"Root");
@@ -57,7 +57,7 @@ void TLSConnect::Impl::LoadCertificates(void)
 
 }
 
-void TLSConnect::Impl::SetupBIO(void)
+void CTLSConnect::Impl::SetupBIO(void)
 {
 	OutputLog("SetupBIO");
 	if ((m_bio = BIO_new_ssl_connect(m_ctx)) == nullptr)
@@ -76,7 +76,7 @@ void TLSConnect::Impl::SetupBIO(void)
 	BIO_set_conn_hostname(m_bio,buff);
 }
 
-void TLSConnect::Impl::handshake(void)
+void CTLSConnect::Impl::handshake(void)
 {
 	if (SSL_connect(m_ssl) <= 0)
 	{
@@ -91,7 +91,7 @@ void TLSConnect::Impl::handshake(void)
 	
 }
 
-void TLSConnect::Impl::request(void)
+void CTLSConnect::Impl::request(void)
 {
 	char msg[100] = { 0 };
 	sprintf_s(msg, 100, "GET %ls HTTP/1.1\r\nHost: %ls\r\nConnection: Close\r\n\r\n",m_urlComp.lpszUrlPath,m_urlComp.lpszHostName);
@@ -111,7 +111,7 @@ void TLSConnect::Impl::request(void)
 	}
 }
 
-void TLSConnect::Impl::ParseUrl(wstring wsUrl)
+void CTLSConnect::Impl::ParseUrl(wstring wsUrl)
 {
 	ZeroMemory(&m_urlComp, sizeof(m_urlComp));
 	m_urlComp.dwStructSize = sizeof(m_urlComp);
@@ -138,17 +138,17 @@ void TLSConnect::Impl::ParseUrl(wstring wsUrl)
 	}
 }
 
-void TLSConnect::open(void)
+void CTLSConnect::open(void)
 {
-	impl->open();
+	pimpl->open();
 }
 
-void TLSConnect::connect(void)
+void CTLSConnect::connect(void)
 {
-	impl->connect();
+	pimpl->connect();
 }
 
-void TLSConnect::close(void)
+void CTLSConnect::close(void)
 {
-	impl->close();
+	pimpl->close();
 }

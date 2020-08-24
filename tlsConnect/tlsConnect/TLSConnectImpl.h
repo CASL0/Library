@@ -14,7 +14,7 @@
 #include <Windows.h>
 #include <winhttp.h>
 
-class TLSConnect::Impl
+class CTLSConnect::Impl
 {
 public:
 	Impl(wstring wsUrl)
