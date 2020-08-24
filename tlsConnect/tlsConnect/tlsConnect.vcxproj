@@ -157,7 +157,7 @@
     <ClCompile Include="TLSConnectImpl.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="tlsConnect.h" />
+    <ClInclude Include="TLSConnect.h" />
     <ClInclude Include="TLSConnectImpl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

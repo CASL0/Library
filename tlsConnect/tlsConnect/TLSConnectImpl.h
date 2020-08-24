@@ -1,7 +1,7 @@
 #ifndef TLSCONNECTIMPL_H
 #define TLSCONNECTIMPL_H
 
-#include "tlsConnect.h"
+#include "TLSConnect.h"
 
 #include <openssl/bio.h>
 #include <openssl/err.h>
