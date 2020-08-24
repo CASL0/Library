@@ -11,9 +11,6 @@
 #define URL_LENGTH 256
 
 
-
-CTLSConnect::CTLSConnect(wstring wsUrl) :pimpl(new Impl(wsUrl)) {}
-
 void CTLSConnect::Impl::SetupSslCtx(void)
 {
 	OutputLog("SetupSslCtx");
@@ -138,17 +135,3 @@ void CTLSConnect::Impl::ParseUrl(wstring wsUrl)
 	}
 }
 
-void CTLSConnect::open(void)
-{
-	pimpl->open();
-}
-
-void CTLSConnect::connect(void)
-{
-	pimpl->connect();
-}
-
-void CTLSConnect::close(void)
-{
-	pimpl->close();
-}

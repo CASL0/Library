@@ -1,6 +1,6 @@
 ﻿
 #include <iostream>
-#include "tlsConnect.h"
+#include "TLSConnect.h"
 
 #pragma comment(lib,"tlsConnect.lib")
 

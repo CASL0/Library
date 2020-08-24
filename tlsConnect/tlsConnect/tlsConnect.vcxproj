@@ -154,6 +154,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="TLSConnect.cpp" />
     <ClCompile Include="TLSConnectImpl.cpp" />
   </ItemGroup>
   <ItemGroup>
