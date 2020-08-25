@@ -18,7 +18,6 @@ void CTLSConnect::Impl::SetupSslCtx(void)
 	{
 		TLSerror("  failed in SSL_CTX_new");
 	}
-	SSL_CTX_set_min_proto_version(m_ctx, TLS1_1_VERSION);
 }
 
 void CTLSConnect::Impl::LoadCertificates(void)
@@ -71,6 +70,19 @@ void CTLSConnect::Impl::SetupBIO(void)
 	char buff[URL_LENGTH];
 	sprintf_s(buff, sizeof(buff), "%ls:443", m_urlComp.lpszHostName);
 	BIO_set_conn_hostname(m_bio,buff);
+	SetTlsExtensions();
+}
+
+void CTLSConnect::Impl::SetTlsExtensions(void)
+{
+	char* host = new char[URL_LENGTH];
+	memset(host, 0, sizeof(host));
+	size_t hostNameLength;
+
+	wcstombs_s(nullptr, host,URL_LENGTH,m_urlComp.lpszHostName, _TRUNCATE);
+	OutputLog(host);
+	SSL_set_tlsext_host_name(m_ssl, host);
+	delete[] host;
 }
 
 void CTLSConnect::Impl::handshake(void)
@@ -90,8 +102,8 @@ void CTLSConnect::Impl::handshake(void)
 
 void CTLSConnect::Impl::request(void)
 {
-	char msg[100] = { 0 };
-	sprintf_s(msg, 100, "GET %ls HTTP/1.1\r\nHost: %ls\r\nConnection: Close\r\n\r\n",m_urlComp.lpszUrlPath,m_urlComp.lpszHostName);
+	char msg[256] = { 0 };
+	sprintf_s(msg, 256, "GET %ls HTTP/1.1\r\nHost: %ls\r\nConnection: Close\r\n\r\n",m_urlComp.lpszUrlPath,m_urlComp.lpszHostName);
 	int ret = SSL_write(m_ssl, msg, strlen(msg));
 	if (ret < 1)
 	{

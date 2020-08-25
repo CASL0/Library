@@ -57,6 +57,7 @@ private:
 	virtual void handshake(void);
 	virtual void request(void);
 	virtual void ParseUrl(wstring wsUrl);
+	virtual void SetTlsExtensions(void);
 
 	void TLSerror(const char* msg)
 	{
