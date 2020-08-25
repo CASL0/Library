@@ -75,14 +75,9 @@ void CTLSConnect::Impl::SetupBIO(void)
 
 void CTLSConnect::Impl::SetTlsExtensions(void)
 {
-	char* host = new char[URL_LENGTH];
-	memset(host, 0, sizeof(host));
-	size_t hostNameLength;
-
-	wcstombs_s(nullptr, host,URL_LENGTH,m_urlComp.lpszHostName, _TRUNCATE);
-	OutputLog(host);
+	char host[URL_LENGTH] = { 0 };
+	sprintf_s(host, sizeof(host), "%ls", m_urlComp.lpszHostName);
 	SSL_set_tlsext_host_name(m_ssl, host);
-	delete[] host;
 }
 
 void CTLSConnect::Impl::handshake(void)
