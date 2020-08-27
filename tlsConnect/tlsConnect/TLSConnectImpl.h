@@ -10,7 +10,7 @@
 #include <openssl/x509v3.h>
 
 #include <string>
-#include <cstdio>
+#include <iostream>
 #include <Windows.h>
 #include <winhttp.h>
 
@@ -62,7 +62,7 @@ private:
 
 	void TLSerror(const char* fileName,int lineNum,const char* msg)
 	{
-		fprintf(stderr, "%s: %i: %s\n", fileName, lineNum, msg);
+		std::cerr << fileName << ": " << lineNum << ": " << msg << std::endl;
 		ERR_print_errors_fp(stderr);
 		exit(-1);
 	}
@@ -77,6 +77,7 @@ private:
 	SSL* m_ssl;
 	BIO* m_bio;
 	URL_COMPONENTS m_urlComp;
+
 };
 
 #endif

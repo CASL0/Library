@@ -88,7 +88,7 @@ void CTLSConnect::Impl::handshake(void)
 	int certVerifyResult = SSL_get_verify_result(m_ssl);
 	if (certVerifyResult != X509_V_OK)
 	{
-		fprintf(stderr, "  invalid certificate: %s\n", X509_verify_cert_error_string(certVerifyResult));
+		std::cerr << "  invalid certificate: " << X509_verify_cert_error_string(certVerifyResult) << std::endl;
 		TLSerror(__FILE__,__LINE__,"  verify error");
 	}
 	
