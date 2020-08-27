@@ -16,7 +16,7 @@ void CTLSConnect::Impl::SetupSslCtx(void)
 	OutputLog("SetupSslCtx");
 	if ((m_ctx = SSL_CTX_new(TLS_client_method())) == nullptr)
 	{
-		TLSerror("  failed in SSL_CTX_new");
+		TLSerror(__FILE__,__LINE__,"  failed in SSL_CTX_new");
 	}
 }
 
@@ -26,13 +26,13 @@ void CTLSConnect::Impl::LoadCertificates(void)
 	HCERTSTORE hStore = CertOpenSystemStore(NULL, L"Root");
 	if (hStore == nullptr)
 	{
-		TLSerror("  failed in CertOpenSystemStore");
+		TLSerror(__FILE__,__LINE__,"  failed in CertOpenSystemStore");
 	}
 	X509* x509=nullptr;
 	PCCERT_CONTEXT pCertCtx = nullptr;
 	while (pCertCtx = CertEnumCertificatesInStore(hStore, pCertCtx))
 	{
-		x509 = d2i_X509(NULL, (const unsigned char**)&pCertCtx->pbCertEncoded, pCertCtx->cbCertEncoded);
+		x509 = d2i_X509(nullptr, (const unsigned char**)&pCertCtx->pbCertEncoded, pCertCtx->cbCertEncoded);
 		
 		if (x509)
 		{
@@ -48,7 +48,7 @@ void CTLSConnect::Impl::LoadCertificates(void)
 	CertFreeCertificateContext(pCertCtx);
 	if (!CertCloseStore(hStore, 0))
 	{
-		TLSerror("  failed in CertCloseStore");
+		TLSerror(__FILE__,__LINE__,"  failed in CertCloseStore");
 	}
 
 }
@@ -58,19 +58,18 @@ void CTLSConnect::Impl::SetupBIO(void)
 	OutputLog("SetupBIO");
 	if ((m_bio = BIO_new_ssl_connect(m_ctx)) == nullptr)
 	{
-		TLSerror("  failed in BIO_new_ssl_connect");
+		TLSerror(__FILE__,__LINE__,"  failed in BIO_new_ssl_connect");
 	}
 	BIO_get_ssl(m_bio, &m_ssl);
 	if (m_ssl == nullptr)
 	{
-		TLSerror("  failed in BIO_get_ssl");
+		TLSerror(__FILE__,__LINE__,"  failed in BIO_get_ssl");
 	}
 
 	SSL_set_mode(m_ssl, SSL_MODE_AUTO_RETRY);
-	char buff[URL_LENGTH];
+	char buff[URL_LENGTH] = { 0 };
 	sprintf_s(buff, sizeof(buff), "%ls:443", m_urlComp.lpszHostName);
 	BIO_set_conn_hostname(m_bio,buff);
-	SetTlsExtensions();
 }
 
 void CTLSConnect::Impl::SetTlsExtensions(void)
@@ -82,15 +81,15 @@ void CTLSConnect::Impl::SetTlsExtensions(void)
 
 void CTLSConnect::Impl::handshake(void)
 {
-	if (SSL_connect(m_ssl) <= 0)
+	if (SSL_connect(m_ssl) < 1)
 	{
-		TLSerror("  failed in SSL_connect");
+		TLSerror(__FILE__,__LINE__,"  failed in SSL_connect");
 	}
 	int certVerifyResult = SSL_get_verify_result(m_ssl);
 	if (certVerifyResult != X509_V_OK)
 	{
 		fprintf(stderr, "  invalid certificate: %s\n", X509_verify_cert_error_string(certVerifyResult));
-		TLSerror("  verify error");
+		TLSerror(__FILE__,__LINE__,"  verify error");
 	}
 	
 }
@@ -102,7 +101,7 @@ void CTLSConnect::Impl::request(void)
 	int ret = SSL_write(m_ssl, msg, strlen(msg));
 	if (ret < 1)
 	{
-		TLSerror("  failed in SSL_write");
+		TLSerror(__FILE__,__LINE__,"  failed in SSL_write");
 	}
 	int buf_size = 1024;
 	char buf[1024];
@@ -115,7 +114,7 @@ void CTLSConnect::Impl::request(void)
 	}
 }
 
-void CTLSConnect::Impl::ParseUrl(wstring wsUrl)
+void CTLSConnect::Impl::ParseUrl(std::wstring wsUrl)
 {
 	ZeroMemory(&m_urlComp, sizeof(m_urlComp));
 	m_urlComp.dwStructSize = sizeof(m_urlComp);

@@ -1,7 +1,7 @@
 #include "TLSConnect.h"
 #include "TLSConnectImpl.h"
 
-CTLSConnect::CTLSConnect(wstring wsUrl) :pimpl(new Impl(wsUrl)) {}
+CTLSConnect::CTLSConnect(std::wstring wsUrl) :pimpl(new Impl(wsUrl)) {}
 
 void CTLSConnect::open(void)
 {

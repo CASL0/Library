@@ -17,7 +17,7 @@
 class CTLSConnect::Impl
 {
 public:
-	Impl(wstring wsUrl)
+	Impl(std::wstring wsUrl)
 	{
 		ParseUrl(wsUrl);
 	}
@@ -30,6 +30,7 @@ public:
 		SetupSslCtx();
 		LoadCertificates();
 		SetupBIO();
+		SetTlsExtensions();
 	}
 
 	void connect(void)
@@ -56,12 +57,12 @@ private:
 	virtual void SetupBIO(void);
 	virtual void handshake(void);
 	virtual void request(void);
-	virtual void ParseUrl(wstring wsUrl);
+	virtual void ParseUrl(std::wstring wsUrl);
 	virtual void SetTlsExtensions(void);
 
-	void TLSerror(const char* msg)
+	void TLSerror(const char* fileName,int lineNum,const char* msg)
 	{
-		fprintf(stderr, "%s: %i: %s\n", __FILE__, __LINE__, msg);
+		fprintf(stderr, "%s: %i: %s\n", fileName, lineNum, msg);
 		ERR_print_errors_fp(stderr);
 		exit(-1);
 	}

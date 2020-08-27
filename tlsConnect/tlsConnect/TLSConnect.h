@@ -2,15 +2,12 @@
 #define TLSCONNECT_H
 
 #include <string>
-#include <wchar.h>
-
-typedef std::basic_string<wchar_t> wstring;
 
 class CTLSConnect
 {
 public:
 
-	CTLSConnect(wstring wsUrl);
+	CTLSConnect(std::wstring wsUrl);
 	virtual ~CTLSConnect()=default;
 	void open(void);
 	void connect(void);
