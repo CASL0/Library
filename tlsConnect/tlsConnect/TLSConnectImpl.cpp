@@ -103,13 +103,15 @@ void CTLSConnect::Impl::request(void)
 	{
 		TLSerror(__FILE__,__LINE__,"  failed in SSL_write");
 	}
-	int buf_size = 1024;
-	char buf[1024];
-	int read_size;
 
+	char buf[1024];
+	int read_size=0;
+
+	const char* outFileName = "file.html";
+	std::ofstream ofStream(outFileName);
 	while ((read_size = SSL_read(m_ssl, buf, 1024 - 1)) > 0)
 	{
-		fprintf(stderr, "%s", buf);
+		ofStream << buf;
 		memset(buf, 0, sizeof(buf));
 	}
 }

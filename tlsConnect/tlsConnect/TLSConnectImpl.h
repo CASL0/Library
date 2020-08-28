@@ -11,13 +11,14 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <Windows.h>
 #include <winhttp.h>
 
 class CTLSConnect::Impl
 {
 public:
-	Impl(std::wstring wsUrl)
+	Impl(std::wstring wsUrl):m_response(std::string())
 	{
 		ParseUrl(wsUrl);
 	}
@@ -77,7 +78,7 @@ private:
 	SSL* m_ssl;
 	BIO* m_bio;
 	URL_COMPONENTS m_urlComp;
-
+	std::string m_response;
 };
 
 #endif
